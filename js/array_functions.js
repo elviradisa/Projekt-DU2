@@ -25,7 +25,7 @@ function array_filter (array, test_function) {
 }
 
 function array_each (array, callback) {
-  // Calls the funtion callback once for each element
+  // Calls the function callback once for each element
   // in array, with the element as argument
   // No checks
   let index = 0;
