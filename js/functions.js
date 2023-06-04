@@ -31,13 +31,12 @@ function click_filter_element (event) {
 // CODE according to specification
 function create_filter_element (data) {
 
-  const {class: filteredElement, textContent, parent} = data;
   const filterElement = document.createElement("li");
-  filterElement.className = filteredElement;
-  filterElement.textContent = textContent;
 
-  parent.appendChild(filterElement);
+  filterElement.className = data.class
+  data.parent.appendChild(filterElement);
 
+  filterElement.textContent = data.textContent;
   filterElement.addEventListener("click", click_filter_element);
 
   return filterElement;
@@ -111,7 +110,35 @@ function create_filter_element (data) {
 // ATTENTION: You need to write the specification of all three functions:
 //            create_countries_cities_filters, create_country and create_city
 function create_countries_cities_filters () {
+
+/*
+Arguments: This function does not take any arguments
+
+Side effects: This function creates a list out of country filter
+and city filter in dom. Country filter exists in a div-element named "country" (class)
+and with the ID country_<country.id>. The city filter exists in a ul-element inside the 
+div-elmement of that specific country. City filter is created by calling the create_city 
+function for every city in the array "CITIES". Both country filter and city filter 
+is appended to the element #country_filter > ul in dom. 
+
+No return value
+*/
   function create_country (country) {
+
+  /*
+    Arguments: 
+    city: is an object representing a country and has the following keys:
+    id: the ID of the country
+    name: is the name of the country
+
+    Side effects: This function creates a list out of country filter in dom which
+    is a div-element called "country" (class) and with the ID country_<country-id>.
+    Country filter contains a h1-element which in turn contains country.name 
+    and one ul-element. This ul-element contains the city filter for the specific
+    country. The country filter is added to #country_filter > ul in dom. 
+
+    No return value
+  */
     const dom = document.createElement("div");
     dom.classList.add("country");
     dom.classList.add("filter_container");
@@ -132,6 +159,21 @@ function create_countries_cities_filters () {
   }
   function create_city (city) {
 
+  /*
+    Arguments:
+    city: an object representing a country with following keys:
+      id: the ID of the city
+      countryID: the ID of the country the city belongs to
+      name: the name of the city
+
+    Side effects: This function creates a city filter in dom. City filter
+    is a li-element named "selected" (class) with its data attrinute 
+    "data-id" set to "city.id". The city filter contains city.name and is added
+    to the ul-element inside the div-element containing its specific country, 
+    decided by city.countryID.
+
+    No return value
+  */
     const dom = create_filter_element({
       parent: document.querySelector(`#country_${city.countryID} > ul`),
       class: "selected",
@@ -185,22 +227,50 @@ function create_language_filter () {
   array_each(LANGUAGES, create_element);
 }
 
+function createFilterForAll (objectArray, filterKind) {
+
+  /*
+  Arguments: 
+    objectArray: an array of objects where the filter elements will be created
+    filterKind: the ID of the dom-elements where the filter elements will be
+
+  Side effects: Appends filter elements to the specific dom-element
+  Adds thr class "selected" to each filter element
+  Sets the data-id attribute of each filter element to the id-property of the 
+  related object in the objectArray
+  Sets the text-content of each filter element to the "name" of the related
+  object in the objectArray
+
+  No return values
+  */
+
+  const filterDom = document.querySelector(`#${filterKind}_filter > ul`);
+
+  objectArray.forEach(objectArray => {
+    const filterElement = document.createElement("li");
+
+    filterElement.classList.add("selected");
+    filterElement.dataset.id = objectArray.id;
+    filterElement.textContent = objectArray.name;
+
+    filterDom.appendChild(filterElement);
+  });
+}
+
 
 // G / VG (see details in specification)
 // CODE according to specifications
 function create_programme (programme) {
 
-  const {title, description, city} = programme;
-
   const programmeElement = document.createElement("div");
-  programmeElement.classList.add("programme");
+  programme.classList.add("programme");
 
   const titleElement = document.createElement("h2");
-  titleElement.textContent = title;
+  titleElement.textContent = programme.title;
   programmeElement.appendChild(titleElement);
 
   const descriptionElement = document.createElement("p");
-  descriptionElement.textContent = description;
+  descriptionElement.textContent = programme.description;
   programmeElement.appendChild(descriptionElement);
   
   /*
@@ -231,6 +301,21 @@ function create_programme (programme) {
 // CODE according to the specification
 function update_programmes () {
 
+  const updateProgrammes = document.querySelector("#programmes > ul");
+  updateProgrammes.innerHTML = ``;
+
+  const programmes = read_filters();
+
+  if (programmes.length !== 0) {
+    const paragraph = document.querySelector("#programmes > p");
+    paragraph.innerHTML = ``;
+  } else {
+    const paragraph = document.querySelector("#programmes > p");
+    paragraph.innerHTML = `Inga program uppfyller nuvarande filter.`;
+  }
+
+  array_each(programmes, create_programme);
+
   /*
       NO ARGUMENTS
 
@@ -256,6 +341,25 @@ function update_programmes () {
 // Optional VG: Which parts of the function's code could be abstracted?
 //              Implement it
 function read_filters () {
+
+  /*
+  No arguments
+
+  Side effects: 
+  This function reads the condition för the filter elements in DOM and return an array of programmes that
+  are to be shown based on the chosen filter.
+  * callback_add_cityID reads the chosen city filter elements and adds the related city ID to the city_id_selected array
+  * callback_add_programmes changes the "programmes"-attay by adding the related prgrmans
+  * callback_add_levelID changes the level_id_selected-array by adding the level ID
+  * callback_add_languageID changes the language_id_selected-array by adding the language ID
+  * callback_add_subjectID changes the subject_id_selected-array by adding the subject ID
+  * test_function_level tests if the given programme matches the selected language
+  * test_function_subject tests if the given programme matches the selected subjects
+  * test_function tests is a given program's name includes the search string
+
+  Return value:
+  These functions return a couple of programmes that are to be displayed based on the chosen filter
+  */
   
   const city_selected_dom = document.querySelectorAll("#country_filter li.selected");
 
