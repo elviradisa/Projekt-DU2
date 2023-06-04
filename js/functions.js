@@ -1,4 +1,4 @@
-console.log("hej");
+
 // G
 // CODE According to specification
 function click_filter_element (event) {
@@ -241,17 +241,17 @@ function createFilterForAll (objectArray, filterKind) {
   Sets the text-content of each filter element to the "name" of the related
   object in the objectArray
 
-  No return values
+  No return value
   */
 
   const filterDom = document.querySelector(`#${filterKind}_filter > ul`);
 
-  objectArray.forEach(objectArray => {
+  objectArray.forEach(item => {
     const filterElement = document.createElement("li");
 
     filterElement.classList.add("selected");
-    filterElement.dataset.id = objectArray.id;
-    filterElement.textContent = objectArray.name;
+    filterElement.dataset.id = item.id;
+    filterElement.textContent = item.name;
 
     filterDom.appendChild(filterElement);
   });
@@ -263,15 +263,23 @@ function createFilterForAll (objectArray, filterKind) {
 function create_programme (programme) {
 
   const programmeElement = document.createElement("div");
-  programme.classList.add("programme");
+  programmeElement.classList.add("programme");
+  programmeElement.innerHTML = `
+    <div>
+      <h2>${programme.name}</h2>
+      <p>${UNIVERSITIES[programme.universityID].name}</p>
+      <p>${CITIES[UNIVERSITIES[programme.universityID].cityID].name}, ${COUNTRIES[CITIES[UNIVERSITIES[programme.universityID].cityID].countryID].name}</p>
+      <p>${UNIVERSITIES[programme.universityID].name}</p>
+    </div>
 
-  const titleElement = document.createElement("h2");
-  titleElement.textContent = programme.title;
-  programmeElement.appendChild(titleElement);
+    <div class="footer">
+      <p>${CITIES[UNIVERSITIES[programme.universityID].cityID].name}, sun-index: ${CITIES[UNIVERSITIES[programme.universityID].cityID].sun}</p> 
+    </div>
+  `;
 
-  const descriptionElement = document.createElement("p");
-  descriptionElement.textContent = programme.description;
-  programmeElement.appendChild(descriptionElement);
+  document.querySelector("#programmes > ul").appendChild(programmeElement);
+
+  
   
   /*
 
